@@ -151,7 +151,7 @@ class List<Value = string> extends React.Component<IProps<Value>> {
       (this.props.values[index] && this.props.values[index].disabled)
     )
       return;
-    const listItemTouched = this.getChildren()[index];
+    const listItemTouched = this.getChildren()[index] as HTMLElement;
     const handle = listItemTouched.querySelector('[data-movable-handle]');
     if (handle && !handle.contains(e.target as any)) {
       return;
@@ -167,12 +167,18 @@ class List<Value = string> extends React.Component<IProps<Value>> {
       });
     if (isTouch) {
       const opts = { passive: false };
+      listItemTouched.style.touchAction = 'none';
       document.addEventListener('touchend', this.schdOnEnd, opts);
       document.addEventListener('touchmove', this.schdOnTouchMove, opts);
       document.addEventListener('touchcancel', this.schdOnEnd, opts);
     } else {
       document.addEventListener('mousemove', this.schdOnMouseMove);
       document.addEventListener('mouseup', this.schdOnEnd);
+
+      const listItemTouched = this.getChildren()[
+        this.state.itemDragged
+      ] as HTMLElement;
+      listItemTouched.style.touchAction = '';
     }
     this.onStart(
       listItemTouched as HTMLElement,
@@ -461,7 +467,7 @@ class List<Value = string> extends React.Component<IProps<Value>> {
       e.preventDefault();
       if (selectedItem === index) {
         if (selectedItem !== this.needle) {
-          this.getChildren().forEach(item => {
+          this.getChildren().forEach((item) => {
             setItemTransition(item, 0);
             transformItem(item, null);
           });
